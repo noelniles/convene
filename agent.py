@@ -9,4 +9,6 @@ class agent:
         self.name = name
         self.speed = 0
         self.world = None       # Map of the world
-        self.start = None       # Starting point
+        self.start = None       # Start point
+        self.end = None         # End point
+        self.leave = None       # When this agent should leave
