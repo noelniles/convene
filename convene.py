@@ -4,7 +4,7 @@
 This is a driver used to simulate multiple agents that have a common 
 destination to convene.
 """
-import argparse
+import argparse, random
 import googlemaps
 import agent
 
@@ -16,9 +16,18 @@ def namer():
         yield n
         n += 1
 
+def random_line(afile):
+    """Return a random line from a text file."""
+    with open(afile) as f:
+        line = next(f)
+        for num, aline in enumerate(f):
+          if random.randrange(num + 2): continue
+          line = aline
+    return line
+
 def random_location():
     """Generate a random location to be used by the agents.  """
-    print("Random location is not implemented yet")
+    return random_line('addr.txt')
 
 def plan():
     """For each agent in the set of agents, calculate the optimal departure time."""
@@ -40,3 +49,5 @@ if __name__ == '__main__':
 
     for agent in agents:
         print('Name: ', agent.name)
+
+    print(random_location())
