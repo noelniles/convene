@@ -41,13 +41,37 @@ if __name__ == '__main__':
     parser.add_argument('-n', '--nagents', type=int)
     args = parser.parse_args()
 
+    if args.nagents is None or args.nagents < 1 or args.nagents > 15:
+        print('You have to supply a number of agents [1-15] as an argument')
+
+    # Generate a random place to convene
+    dest = random_location()
+
     # Create new agents and add them to the set of agents
     n = namer()
     while args.nagents:
-        agents.add(agent.agent(next(n)))
+        # Generate an agent.
+        a = agent.agent(next(n))
+
+        # Give the agent a random starting location.
+        a.start = random_location()
+
+        # Set the meeting point.
+        a.end = dest
+
+        # Give the agent a random speed.
+        a.speed = random.randint(2, 80)
+
+        # Add the newly created agent to the set of agents
+        agents.add(a)
+
+        # Movin on...
         args.nagents -= 1
 
     for agent in agents:
         print('Name: ', agent.name)
+        print('Start: ', agent.start)
+        print('End: ', agent.end)
+        print('Speed:', agent.speed)
+        print()
 
-    print(random_location())
