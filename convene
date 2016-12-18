@@ -4,7 +4,7 @@
 This is a driver used to simulate multiple agents that have a common 
 destination to convene.
 """
-import argparse, os, logging, time, random
+import argparse, cProfile, os, logging, time, random
 from datetime import datetime, timedelta
 import agent
 
@@ -156,9 +156,8 @@ def log_setup(fn=None):
     logger.addHandler(console_handle)
     return (logfile_handle.baseFilename, logger)
 
-
 def parseargs():
-    # Set up the argument parser
+    """Setup an argparser and return the parser."""
     parser = argparse.ArgumentParser()
     parser.add_argument('-n', type=int, metavar='#AGENTS', required=True,
             help='The number of agents in the simulation. Limit is 20.')
@@ -166,44 +165,55 @@ def parseargs():
     parser.add_argument('-d', action="store_true",
             help='Print extra debugging stuff')
     parser.add_argument('-v', action='store_true', help='verbose output')
+    parser.add_argument('-p', action='store_true', help='profile')
     return parser.parse_args()
 
-
-
-
-if __name__ == '__main__':
-    args = parseargs()
-    logfile, logger = log_setup(args.l)
-    now = datetime.now()
-    logger.info('PROGRAM START TIME: {}'.format(str(now)))
-
-    if args.n is None or args.n < 1 or args.n > 20:
-        print('You have to supply a number of agents [1-15] as an argument')
-
-    dest = random_location()            # Generate a random place to convene.
-    meeting_time = random_time()        # Generate a random time to convene.
-
-    # Log the meeting time and destination
-    if args.v: logger.debug('LOC: {} TIME: {}'.format(dest, meeting_time))
-    logger.info('LOC: {} TIME: {}'.format(dest, meeting_time))
-
-    n = namer()                         # Generate unique agent names.
-    na = args.n                         # Copy n to use as a counter.
-
+def generate_agents(n, dest):
+    names = namer()                     # Generate unique agent names.
     agents = list()                     # List of all agents
-    while na:                           # Add agents to the list
-        a = agent.agent(next(n))        # Generate an agent with a name
+
+    while n:                            # Add agents to the list
+        a = agent.agent(next(names))    # Generate an agent with a name
         a.start = random_location()     # Give agent a starting location
         a.end = dest                    # Set the meeting point
         a.speed = random.randint(2, 80) # Random speed
         agents.append(a)                # Add to list of agents
         mode_of_transit(a)              # Set transport mode
-        na -= 1                         # Movin on...
+        n -= 1                          # Movin on...
+    return agents
 
+def validate_args(args):
+    if args.n is None or args.n < 1 or args.n > 20:
+        print('You have to supply a number of agents [1-15] as an argument')
+        exit(2)
+
+def start_logging(logfile, logger, dest, meeting_time):
+    now = datetime.now()
+    logger.info('PROGRAM START TIME: {}'.format(str(now)))
+
+    # Log the meeting time and destination
+    if args.v:
+        logger.debug('LOC: {} TIME: {}'.format(dest, meeting_time))
+
+    logger.info('LOC: {} TIME: {}'.format(dest, meeting_time))
     print('Planning departure times for {} agents.'.format(args.n))
     print('Results will be stored in {}.'.format(logfile))
 
-    plan(agents, dest, meeting_time, debug=args.d)  # Calculate departure time.
+def main():
+    """Main entry point all wrapped up to allow easy profiling."""
+    logfile, logger = log_setup(args.l) # Set up the logs.
 
+    dest = random_location()            # Generate a random place to convene.
+    meeting_time = random_time()        # Generate a random time to convene.
+
+    start_logging(logfile, logger, dest, meeting_time)
+    agents = generate_agents(args.n, dest)
+    plan(agents, dest, meeting_time, debug=args.d)  # Calculate departure time.
     log_results(agents, logger)
+
+if __name__ == '__main__':
+    args = parseargs()                  # Get CLI arguments.
+    validate_args(args)                 # Check for mandatory arguments.
+    if args.p: cProfile.run('main()', 'convene_stats.log')     # Profile...
+    else: main()                        # Or just run.
 
