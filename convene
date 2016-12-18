@@ -18,7 +18,7 @@ try:
 except ImportError as e:
     print("IMPORT ERROR: ", e)
     print("Please install googlemaps Python bindings")
-    print("Try the command: 'pip3 install googlemaps'\nI know this works on Ubuntu")
+    print("Try the command: 'pip3 install googlemaps'\nI know this works on Ubuntu 16.04")
 
 def namer():
     """Yield the next integer. Used to generate unique sequential names."""
@@ -29,6 +29,9 @@ def namer():
 
 def key():
     """Get the google maps api key from the text file."""
+    if not os.path.exists('mapkey.txt'):
+        print("You need to get a google maps API key and save it in a file called 'mapkey.txt")
+        sys.exit(-1)
     with open('mapkey.txt') as f:
         line = f.readline()
     return line
@@ -72,7 +75,9 @@ def random_location():
     return random_line('addr.txt')
 
 def plan(agents, dest, meeting_time):
-    """For each agent in the set of agents, calculate the optimal departure time.
+    """For each agent in the set of agents, calculate the optimal departure time
+    by subtracting the duration that google says it will take from the time 
+    that we want to meet.
    
     TODO:
     This is the one function that makes requests to the google maps API so it
@@ -87,7 +92,7 @@ def plan(agents, dest, meeting_time):
         dist = gmaps.distance_matrix(a.start, dest, mode=a.mode)
         seconds_away = dist['rows'][0]['elements'][0]['duration']['value']
         delta = timedelta(seconds=seconds_away)
-        print(meeting_time - delta)
+        a.leave = meeting_time - delta
 
 agents = set()      # The set of all agents in the simulation
 
@@ -131,12 +136,13 @@ if __name__ == '__main__':
         args.nagents -= 1
 
     plan(agents, dest, meeting_time)
-    #for agent in agents:
-    #    print('--------------------------------------------------------------')
-    #    print('Name: ', agent.name)
-    #    print('Start: ', agent.start)
-    #    print('End: ', agent.end)
-    #    print('Speed: ', agent.speed)
-    #    print('Mode: ', agent.mode)
-    #    print('--------------------------------------------------------------')
+    for agent in agents:
+        print('--------------------------------------------------------------')
+        print('Name: ', agent.name)
+        print('Start: ', agent.start)
+        print('End: ', agent.end)
+        print('Speed: ', agent.speed)
+        print('Mode: ', agent.mode)
+        print('Leave time: ', agent.leave)
+        print('--------------------------------------------------------------')
 
