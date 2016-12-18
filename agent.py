@@ -8,7 +8,7 @@ class agent:
     def __init__(self, name):
         self.name = name
         self.speed = 0
-        self.world = None       # Map of the world
+        self.world = None       # Map of the world, not implemented yet
         self.start = None       # Start point
         self.end = None         # End point
         self.leave = None       # When this agent should leave

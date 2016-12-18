@@ -107,32 +107,41 @@ agents = set()      # The set of all agents in the simulation
 if __name__ == '__main__':
     # Set up the argument parser
     parser = argparse.ArgumentParser()
-    parser.add_argument('-n', '--nagents', type=int)
-    parser.add_argument('--log', type=str)
-    parser.add_argument('--dbg', action="store_true")
+    parser.add_argument('-n', type=int, metavar='#AGENTS', required=True,
+            help='The number of agents in the simulation. Limit is 20.')
+    parser.add_argument('-l', type=str, metavar='LOGFILE_NAME', help='What to call the logfile')
+    parser.add_argument('-d', action="store_true",
+            help='Print extra debugging stuff')
+    parser.add_argument('-v', action='store_true', help='verbose output')
     args = parser.parse_args()
 
     # Set up logging
     logger = logging.getLogger('convene_logger')
     logger.setLevel(logging.INFO)
 
-    if args.log: logfile = args.log
+    if args.l: logfile = args.l
     else: logfile = 'convene.log'
 
     # Handle for the log file
     logfile_handle = logging.FileHandler(logfile)
 
+    # Handle for console logging
+    console_handle = logging.StreamHandler()
+    console_handle.setLevel(logging.DEBUG)
+
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
     logfile_handle.setFormatter(formatter)
     logfile_handle.setLevel(logging.INFO)
+    console_handle.setFormatter(formatter)
 
-    # Add the handler to the logger
+    # Add the handlers to the logger
     logger.addHandler(logfile_handle)
+    logger.addHandler(console_handle)
 
     now = datetime.now()
     logger.info('PROGRAM START TIME: {}'.format(str(now)))
 
-    if args.nagents is None or args.nagents < 1 or args.nagents > 15:
+    if args.n is None or args.n < 1 or args.n > 15:
         print('You have to supply a number of agents [1-15] as an argument')
 
     # Generate a random place to convene.
@@ -142,12 +151,13 @@ if __name__ == '__main__':
     meeting_time = random_time()
 
     # Log the meeting time and destination
+    if args.v: logger.debug('LOC: {} TIME: {}'.format(dest, meeting_time))
     logger.info('LOC: {} TIME: {}'.format(dest, meeting_time))
 
     # Create new agents and add them to the set of agents.
     n = namer()
 
-    na = args.nagents
+    na = args.n
     while na:
         # Generate an agent with a name.
         a = agent.agent(next(n))
@@ -170,12 +180,24 @@ if __name__ == '__main__':
         # Movin on...
         na -= 1
 
-    print('Planning departure times for {} agents.'.format(args.nagents))
+    print('Planning departure times for {} agents.'.format(args.n))
     print('Results will be stored in {}.'.format(logfile))
-    plan(agents, dest, meeting_time, debug=args.dbg)
+    plan(agents, dest, meeting_time, debug=args.d)
     for agent in agents:
         # Log the results
         b = '-'*20
+
+        if args.v: # Be verbose. Log stuff to the console.
+            logger.debug('{} BEGIN AGENT {} {}'.format(b, str(agent.name), b))
+            logger.debug('AGENT: {:>}'.format(agent.name))
+            logger.debug('STARTING LOCATION: {:>}'.format(agent.start.strip()))
+            logger.debug('MEEETING LOCATION: {}'.format(agent.end.strip()))
+            logger.debug('SPEED: {}'.format(agent.speed))
+            logger.debug('MODE: {}'.format(agent.mode))
+            logger.debug('DEPARTURE TIME: {}'.format(agent.leave))
+            logger.debug('{}- END AGENT {} -{}'.format(b, str(agent.name), b))
+
+        # Log stuff to a file
         logger.info('{} BEGIN AGENT {} {}'.format(b, str(agent.name), b))
         logger.info('AGENT: {:>}'.format(agent.name))
         logger.info('STARTING LOCATION: {:>}'.format(agent.start.strip()))
