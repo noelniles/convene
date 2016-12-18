@@ -5,7 +5,7 @@ This is a driver used to simulate multiple agents that have a common
 destination to convene.
 """
 import argparse, time, random
-from datetime import datetime
+from datetime import datetime, timedelta
 import googlemaps
 import agent
 
@@ -61,7 +61,7 @@ def random_location():
     """Generate a random location to be used by the agents.  """
     return random_line('addr.txt')
 
-def plan(agents, dest):
+def plan(agents, dest, meeting_time):
     """For each agent in the set of agents, calculate the optimal departure time.
    
     TODO:
@@ -72,11 +72,12 @@ def plan(agents, dest):
     print('planning...')
     k = key().strip()
     gmaps = googlemaps.Client(k)
-    res = gmaps.distance_matrix('21.326674, -157.873421', '21.305277, -157.655481')
-    print(res)
+    print('meeting time: ', meeting_time)
     for a in agents:
         dist = gmaps.distance_matrix(a.start, dest)
-        print(dist)
+        seconds_away = dist['rows'][0]['elements'][0]['duration']['value']
+        delta = timedelta(seconds=seconds_away)
+        print(meeting_time - delta)
 
 agents = set()      # The set of all agents in the simulation
 
@@ -119,7 +120,7 @@ if __name__ == '__main__':
         # Movin on...
         args.nagents -= 1
 
-    plan(agents, dest)
+    plan(agents, dest, meeting_time)
     #for agent in agents:
     #    print('--------------------------------------------------------------')
     #    print('Name: ', agent.name)
@@ -129,6 +130,3 @@ if __name__ == '__main__':
     #    print('Mode: ', agent.mode)
     #    print('--------------------------------------------------------------')
 
-
-    print(key())
-    print(meeting_time)
