@@ -4,7 +4,7 @@
 This is a driver used to simulate multiple agents that have a common 
 destination to convene.
 """
-import argparse, time, random
+import argparse, os, time, random
 from datetime import datetime, timedelta
 import agent
 
@@ -139,8 +139,8 @@ if __name__ == '__main__':
     for agent in agents:
         print('--------------------------------------------------------------')
         print('Name: ', agent.name)
-        print('Start: ', agent.start)
-        print('End: ', agent.end)
+        print('Start: ', agent.start.strip())
+        print('End: ', agent.end.strip())
         print('Speed: ', agent.speed)
         print('Mode: ', agent.mode)
         print('Leave time: ', agent.leave)
