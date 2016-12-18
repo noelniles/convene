@@ -215,6 +215,10 @@ def main():
 if __name__ == '__main__':
     args = parseargs()                  # Get CLI arguments.
     validate_args(args)                 # Check for mandatory arguments.
-    if args.p: cProfile.run('main()', 'convene_stats.log')     # Profile...
+    if args.p:
+        import pstats
+        cProfile.run('main()', 'convene_stats.log')     # Profile...
+        p = pstats.Stats('convene_stats.log')
+        p.strip_dirs().sort_stats('time').print_stats(10)
     else: main()                        # Or just run.
 

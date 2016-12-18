@@ -33,6 +33,10 @@ it from the command line e.g. on Linux...
 `convene -v -d -n 3 -l test.log`  
 ![Verbose demo image](/demo/convene_verbose_debug.png?raw=true)
 
+### Profiling with cProfile
+`convene -p -n 3`
+![Profile demo](/demo/convene_profile_demo.png?raw=true)
+
 #### N.B.
 The *-n* option is to specify the number of agents to create in the simulation.
 Right now this is capped at 20 to reduce the risk of hitting the rate limits on
