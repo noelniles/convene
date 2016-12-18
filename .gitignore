@@ -1,6 +1,9 @@
 # Swap files
 *.swp
 
+# log files
+*.log
+
 # Shhh... Google maps API key
 mapkey.txt
 

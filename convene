@@ -4,7 +4,7 @@
 This is a driver used to simulate multiple agents that have a common 
 destination to convene.
 """
-import argparse, os, time, random
+import argparse, os, logging, time, random
 from datetime import datetime, timedelta
 import agent
 
@@ -70,11 +70,17 @@ def random_line(afile):
           line = aline
     return line
 
+def last_line(afile):
+    """Get the last line of a file."""
+    with open(afile) as f:
+        for line in f: pass
+    return int(line)
+
 def random_location():
     """Generate a random location to be used by the agents.  """
     return random_line('addr.txt')
 
-def plan(agents, dest, meeting_time):
+def plan(agents, dest, meeting_time, debug=False):
     """For each agent in the set of agents, calculate the optimal departure time
     by subtracting the duration that google says it will take from the time 
     that we want to meet.
@@ -90,6 +96,8 @@ def plan(agents, dest, meeting_time):
     print('meeting time: ', meeting_time)
     for a in agents:
         dist = gmaps.distance_matrix(a.start, dest, mode=a.mode)
+        if debug:
+            print(dist)
         seconds_away = dist['rows'][0]['elements'][0]['duration']['value']
         delta = timedelta(seconds=seconds_away)
         a.leave = meeting_time - delta
@@ -100,7 +108,29 @@ if __name__ == '__main__':
     # Set up the argument parser
     parser = argparse.ArgumentParser()
     parser.add_argument('-n', '--nagents', type=int)
+    parser.add_argument('--log', type=str)
+    parser.add_argument('--dbg', action="store_true")
     args = parser.parse_args()
+
+    # Set up logging
+    logger = logging.getLogger('convene_logger')
+    logger.setLevel(logging.INFO)
+
+    if args.log: logfile = args.log
+    else: logfile = 'convene.log'
+
+    # Handle for the log file
+    logfile_handle = logging.FileHandler(logfile)
+
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    logfile_handle.setFormatter(formatter)
+    logfile_handle.setLevel(logging.INFO)
+
+    # Add the handler to the logger
+    logger.addHandler(logfile_handle)
+
+    now = datetime.now()
+    logger.info('PROGRAM START TIME: {}'.format(str(now)))
 
     if args.nagents is None or args.nagents < 1 or args.nagents > 15:
         print('You have to supply a number of agents [1-15] as an argument')
@@ -111,9 +141,14 @@ if __name__ == '__main__':
     # Generate a random time to convene.
     meeting_time = random_time()
 
+    # Log the meeting time and destination
+    logger.info('LOC: {} TIME: {}'.format(dest, meeting_time))
+
     # Create new agents and add them to the set of agents.
     n = namer()
-    while args.nagents:
+
+    na = args.nagents
+    while na:
         # Generate an agent with a name.
         a = agent.agent(next(n))
 
@@ -133,16 +168,20 @@ if __name__ == '__main__':
         mode_of_transit(a)
 
         # Movin on...
-        args.nagents -= 1
+        na -= 1
 
-    plan(agents, dest, meeting_time)
+    print('Planning departure times for {} agents.'.format(args.nagents))
+    print('Results will be stored in {}.'.format(logfile))
+    plan(agents, dest, meeting_time, debug=args.dbg)
     for agent in agents:
-        print('--------------------------------------------------------------')
-        print('Name: ', agent.name)
-        print('Start: ', agent.start.strip())
-        print('End: ', agent.end.strip())
-        print('Speed: ', agent.speed)
-        print('Mode: ', agent.mode)
-        print('Leave time: ', agent.leave)
-        print('--------------------------------------------------------------')
+        # Log the results
+        b = '-'*20
+        logger.info('{} BEGIN AGENT {} {}'.format(b, str(agent.name), b))
+        logger.info('AGENT: {:>}'.format(agent.name))
+        logger.info('STARTING LOCATION: {:>}'.format(agent.start.strip()))
+        logger.info('MEEETING LOCATION: {}'.format(agent.end.strip()))
+        logger.info('SPEED: {}'.format(agent.speed))
+        logger.info('MODE: {}'.format(agent.mode))
+        logger.info('DEPARTURE TIME: {}'.format(agent.leave))
+        logger.info('{}- END AGENT {} -{}'.format(b, str(agent.name), b))
 
