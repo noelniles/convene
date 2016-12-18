@@ -24,7 +24,7 @@ optional arguments:
   -p               profile
 ```
 First make sure that the file called `convene` is executable and then just run
-it from the command line e.g. on Linux  
+it from the command line e.g. on Linux...   
 ### Barebones example
 `convene -n 3`  
 ![Demo image](/demo/convene_demo_barebones.png?raw=true)
@@ -38,7 +38,7 @@ The *-n* option is to specify the number of agents to create in the simulation.
 Right now this is capped at 20 to reduce the risk of hitting the rate limits on
 the Google Maps API.
 
-## What's going on here.
+# What's going on here?
 This program generates a number of agents at random locations. All the agents
 have a common destination. The first problem...  
 ### Phase 1

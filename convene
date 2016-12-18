@@ -201,6 +201,7 @@ def start_logging(logfile, logger, dest, meeting_time):
 
 def main():
     """Main entry point all wrapped up to allow easy profiling."""
+    if not args.l: args.l = 'convene.log'
     logfile, logger = log_setup(args.l) # Set up the logs.
 
     dest = random_location()            # Generate a random place to convene.
