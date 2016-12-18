@@ -13,7 +13,10 @@ saved in *mapkey.txt* you should be ready to run the code.
 
 ## How to run
 First make sure that the file called `convene` is executable and then just run
-it from the command line e.g. on Linux `convene -n 5`. The *-n* option is to 
+it from the command line e.g. on Linux `convene -n 5`.  
+![Demo image](/demo/conven_demo.png?raw=true)
+
+The *-n* option is to 
 specify the number of agents to create in the simulation. Right now this is 
 capped at 20 to reduce the risk of hitting the rate limits on the Google Maps
 API.
