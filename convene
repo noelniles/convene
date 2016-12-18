@@ -102,7 +102,7 @@ def plan(agents, dest, meeting_time, debug=False):
         delta = timedelta(seconds=seconds_away)
         a.leave = meeting_time - delta
 
-agents = set()      # The set of all agents in the simulation
+agents = list()      # The set of all agents in the simulation
 
 if __name__ == '__main__':
     # Set up the argument parser
@@ -172,7 +172,7 @@ if __name__ == '__main__':
         a.speed = random.randint(2, 80)
 
         # Add the newly created agent to the set of agents
-        agents.add(a)
+        agents.append(a)
 
         # Set the mode of transportation
         mode_of_transit(a)
