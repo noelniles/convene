@@ -102,7 +102,6 @@ def plan(agents, dest, meeting_time, debug=False):
         delta = timedelta(seconds=seconds_away)
         a.leave = meeting_time - delta
 
-agents = list()      # The set of all agents in the simulation
 
 if __name__ == '__main__':
     # Set up the argument parser
@@ -124,14 +123,15 @@ if __name__ == '__main__':
 
     # Handle for the log file
     logfile_handle = logging.FileHandler(logfile)
+    logfile_handle.setLevel(logging.INFO)
 
     # Handle for console logging
     console_handle = logging.StreamHandler()
     console_handle.setLevel(logging.DEBUG)
 
+    # Add some formatting to the 2 log handlers
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
     logfile_handle.setFormatter(formatter)
-    logfile_handle.setLevel(logging.INFO)
     console_handle.setFormatter(formatter)
 
     # Add the handlers to the logger
@@ -144,50 +144,34 @@ if __name__ == '__main__':
     if args.n is None or args.n < 1 or args.n > 15:
         print('You have to supply a number of agents [1-15] as an argument')
 
-    # Generate a random place to convene.
-    dest = random_location()
-
-    # Generate a random time to convene.
-    meeting_time = random_time()
+    dest = random_location()            # Generate a random place to convene.
+    meeting_time = random_time()        # Generate a random time to convene.
 
     # Log the meeting time and destination
     if args.v: logger.debug('LOC: {} TIME: {}'.format(dest, meeting_time))
     logger.info('LOC: {} TIME: {}'.format(dest, meeting_time))
 
-    # Create new agents and add them to the set of agents.
-    n = namer()
+    n = namer()                         # Generate unique agent names.
+    na = args.n                         # Copy n to use as a counter.
 
-    na = args.n
-    while na:
-        # Generate an agent with a name.
-        a = agent.agent(next(n))
-
-        # Give the agent a random starting location.
-        a.start = random_location()
-
-        # Set the meeting point.
-        a.end = dest
-
-        # Give the agent a random speed.
-        a.speed = random.randint(2, 80)
-
-        # Add the newly created agent to the set of agents
-        agents.append(a)
-
-        # Set the mode of transportation
-        mode_of_transit(a)
-
-        # Movin on...
-        na -= 1
+    agents = list()                     # List of all agents
+    while na:                           # Add agents to the list
+        a = agent.agent(next(n))        # Generate an agent with a name
+        a.start = random_location()     # Give agent a starting location
+        a.end = dest                    # Set the meeting point
+        a.speed = random.randint(2, 80) # Random speed
+        agents.append(a)                # Add to list of agents
+        mode_of_transit(a)              # Set transport mode
+        na -= 1                         # Movin on...
 
     print('Planning departure times for {} agents.'.format(args.n))
     print('Results will be stored in {}.'.format(logfile))
-    plan(agents, dest, meeting_time, debug=args.d)
-    for agent in agents:
-        # Log the results
-        b = '-'*20
 
-        if args.v: # Be verbose. Log stuff to the console.
+    plan(agents, dest, meeting_time, debug=args.d)  # Calculate departure time.
+
+    for agent in agents:                # Log the results for each agent.
+        b = '-'*20                      # A delimeter between records
+        if args.v:                      # Be verbose. Log stuff to the console.
             logger.debug('{} BEGIN AGENT {} {}'.format(b, str(agent.name), b))
             logger.debug('AGENT: {:>}'.format(agent.name))
             logger.debug('STARTING LOCATION: {:>}'.format(agent.start.strip()))
