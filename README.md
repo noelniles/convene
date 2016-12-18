@@ -40,5 +40,11 @@ the Google Maps API.
 ## What's going on here.
 This program generates a number of agents at random locations. All the agents
 have a common destination. The first problem...  
-1. Given the agents have a different speed calculate the time each one should 
-leave in order to arrive at a common meeting point.
+### Phase 1
+**Given:**
+1. n agents with different speeds and locations
+2. A common meeting destination
+3. A time that all the agents should meet
+
+**Find:**  
+When each agents should leave to meet at the destination at the same time.
