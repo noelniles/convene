@@ -12,3 +12,4 @@ class agent:
         self.start = None       # Start point
         self.end = None         # End point
         self.leave = None       # When this agent should leave
+        self.mode = None        # Mode of transit
