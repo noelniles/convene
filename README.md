@@ -41,7 +41,7 @@ the Google Maps API.
 This program generates a number of agents at random locations. All the agents
 have a common destination. The first problem...  
 ### Phase 1
-**Given:**
+**Given:**  
 1. n agents with different speeds and locations
 2. A common meeting destination
 3. A time that all the agents should meet
