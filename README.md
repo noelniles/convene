@@ -7,7 +7,7 @@ Help agents gather
 by running `pip3 install googlemaps`.
 3. Get a google maps API key. The program tries to load a google maps API key
 from a text file called *mapkey.txt* if that file isn't there it will tell you.
-To obtain a Google Maps API key see [this page](https://developers.google.com/maps/documentation/geocoding/get-api-key)
+To obtain a Google Maps API key see [this page](https://github.com/googlemaps/google-maps-services-python)
 4. OK...Once you have the repo cloned, the bindings installed, and an API key 
 saved in *mapkey.txt* you should be ready to run the code.
 
