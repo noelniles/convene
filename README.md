@@ -42,9 +42,9 @@ This program generates a number of agents at random locations. All the agents
 have a common destination. The first problem...  
 ### Phase 1
 **Given:**  
-1. n agents with different speeds and locations
-2. A common meeting destination
-3. A time that all the agents should meet
+1. n agents with different speeds and locations  
+2. A common meeting destination  
+3. A time that all the agents should meet  
 
 **Find:**  
 When each agents should leave to meet at the destination at the same time.
