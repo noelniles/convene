@@ -98,9 +98,37 @@ def plan(agents, dest, meeting_time, debug=False):
         dist = gmaps.distance_matrix(a.start, dest, mode=a.mode)
         if debug:
             print(dist)
-        seconds_away = dist['rows'][0]['elements'][0]['duration']['value']
+        try:
+            seconds_away = dist['rows'][0]['elements'][0]['duration']['value']
+        except KeyError as e:
+            print('ERROR: agent {} can not reach the destination'.format(a))
         delta = timedelta(seconds=seconds_away)
+        a.delta = delta
         a.leave = meeting_time - delta
+
+def log_results(agents, logger):
+    for agent in agents:                # Log the results for each agent.
+        b = '-'*20                      # A delimeter between records
+        if args.v:                      # Be verbose. Log stuff to the console.
+            logger.debug('{} BEGIN AGENT {} {}'.format(b, str(agent.name), b))
+            logger.debug('AGENT: {}'.format(agent.name))
+            logger.debug('STARTING LOCATION: {}'.format(agent.start.strip()))
+            logger.debug('MEEETING LOCATION: {}'.format(agent.end.strip()))
+            logger.debug('SPEED: {}'.format(agent.speed))
+            logger.debug('MODE: {}'.format(agent.mode))
+            logger.debug('DEPARTURE TIME: {}'.format(agent.leave))
+            logger.debug('{}- END AGENT {} -{}'.format(b, str(agent.name), b))
+
+        # Log stuff to a file
+        logger.info('{} BEGIN AGENT {} {}'.format(b, str(agent.name), b))
+        logger.info('AGENT: {:>}'.format(agent.name))
+        logger.info('STARTING LOCATION: {:>}'.format(agent.start.strip()))
+        logger.info('MEEETING LOCATION: {}'.format(agent.end.strip()))
+        logger.info('SPEED: {}'.format(agent.speed))
+        logger.info('MODE: {}'.format(agent.mode))
+        logger.info('DURATION: {}'.format(agent.delta))
+        logger.info('DEPARTURE TIME: {}'.format(agent.leave))
+        logger.info('{}- END AGENT {} -{}'.format(b, str(agent.name), b))
 
 
 if __name__ == '__main__':
@@ -141,7 +169,7 @@ if __name__ == '__main__':
     now = datetime.now()
     logger.info('PROGRAM START TIME: {}'.format(str(now)))
 
-    if args.n is None or args.n < 1 or args.n > 15:
+    if args.n is None or args.n < 1 or args.n > 20:
         print('You have to supply a number of agents [1-15] as an argument')
 
     dest = random_location()            # Generate a random place to convene.
@@ -169,25 +197,5 @@ if __name__ == '__main__':
 
     plan(agents, dest, meeting_time, debug=args.d)  # Calculate departure time.
 
-    for agent in agents:                # Log the results for each agent.
-        b = '-'*20                      # A delimeter between records
-        if args.v:                      # Be verbose. Log stuff to the console.
-            logger.debug('{} BEGIN AGENT {} {}'.format(b, str(agent.name), b))
-            logger.debug('AGENT: {:>}'.format(agent.name))
-            logger.debug('STARTING LOCATION: {:>}'.format(agent.start.strip()))
-            logger.debug('MEEETING LOCATION: {}'.format(agent.end.strip()))
-            logger.debug('SPEED: {}'.format(agent.speed))
-            logger.debug('MODE: {}'.format(agent.mode))
-            logger.debug('DEPARTURE TIME: {}'.format(agent.leave))
-            logger.debug('{}- END AGENT {} -{}'.format(b, str(agent.name), b))
-
-        # Log stuff to a file
-        logger.info('{} BEGIN AGENT {} {}'.format(b, str(agent.name), b))
-        logger.info('AGENT: {:>}'.format(agent.name))
-        logger.info('STARTING LOCATION: {:>}'.format(agent.start.strip()))
-        logger.info('MEEETING LOCATION: {}'.format(agent.end.strip()))
-        logger.info('SPEED: {}'.format(agent.speed))
-        logger.info('MODE: {}'.format(agent.mode))
-        logger.info('DEPARTURE TIME: {}'.format(agent.leave))
-        logger.info('{}- END AGENT {} -{}'.format(b, str(agent.name), b))
+    log_results(agents, logger)
 
