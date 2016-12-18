@@ -13,7 +13,7 @@ saved in *mapkey.txt* you should be ready to run the code.
 
 ## How to run
 ```
-usage: convene [-h] -n #AGENTS [-l LOGFILE_NAME] [-d] [-v]
+usage: convene [-h] -n #AGENTS [-l LOGFILE_NAME] [-d] [-v] [-p]
 
 optional arguments:
   -h, --help       show this help message and exit
@@ -21,6 +21,7 @@ optional arguments:
   -l LOGFILE_NAME  What to call the logfile
   -d               Print extra debugging stuff
   -v               verbose output
+  -p               profile
 ```
 First make sure that the file called `convene` is executable and then just run
 it from the command line e.g. on Linux  
