@@ -130,23 +130,12 @@ def log_results(agents, logger):
         logger.info('DEPARTURE TIME: {}'.format(agent.leave))
         logger.info('{}- END AGENT {} -{}'.format(b, str(agent.name), b))
 
-
-if __name__ == '__main__':
-    # Set up the argument parser
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-n', type=int, metavar='#AGENTS', required=True,
-            help='The number of agents in the simulation. Limit is 20.')
-    parser.add_argument('-l', type=str, metavar='LOGFILE_NAME', help='What to call the logfile')
-    parser.add_argument('-d', action="store_true",
-            help='Print extra debugging stuff')
-    parser.add_argument('-v', action='store_true', help='verbose output')
-    args = parser.parse_args()
-
+def log_setup(fn=None):
     # Set up logging
     logger = logging.getLogger('convene_logger')
     logger.setLevel(logging.INFO)
 
-    if args.l: logfile = args.l
+    if fn: logfile = fn
     else: logfile = 'convene.log'
 
     # Handle for the log file
@@ -165,7 +154,26 @@ if __name__ == '__main__':
     # Add the handlers to the logger
     logger.addHandler(logfile_handle)
     logger.addHandler(console_handle)
+    return (logfile_handle.baseFilename, logger)
 
+
+def parseargs():
+    # Set up the argument parser
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-n', type=int, metavar='#AGENTS', required=True,
+            help='The number of agents in the simulation. Limit is 20.')
+    parser.add_argument('-l', type=str, metavar='LOGFILE_NAME', help='What to call the logfile')
+    parser.add_argument('-d', action="store_true",
+            help='Print extra debugging stuff')
+    parser.add_argument('-v', action='store_true', help='verbose output')
+    return parser.parse_args()
+
+
+
+
+if __name__ == '__main__':
+    args = parseargs()
+    logfile, logger = log_setup(args.l)
     now = datetime.now()
     logger.info('PROGRAM START TIME: {}'.format(str(now)))
 
