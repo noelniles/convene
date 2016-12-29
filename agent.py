@@ -9,8 +9,10 @@ class agent:
         self.name = name
         self.speed = 0
         self.world = None       # Map of the world, not implemented yet
-        self.start = None       # Start point
-        self.end = None         # End point
+        self.start_geo = None       # Start point
+        self.end_geo = None         # End point
+        self.start_address = None
+        self.end_address = None
         self.leave = None       # When this agent should leave
         self.mode = None        # Mode of transit
         self.delta = 0

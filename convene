@@ -95,7 +95,9 @@ def plan(agents, dest, meeting_time, debug=False):
     gmaps = googlemaps.Client(k)
     print('meeting time: ', meeting_time)
     for a in agents:
-        dist = gmaps.distance_matrix(a.start, dest, mode=a.mode)
+        dist = gmaps.distance_matrix(a.start_geo, dest, mode=a.mode)
+        a.start_address = dist['origin_addresses']
+        a.end_address = dist['destination_addresses']
         if debug:
             print(dist)
         try:
@@ -112,8 +114,10 @@ def log_results(agents, logger):
         if args.v:                      # Be verbose. Log stuff to the console.
             logger.debug('{} BEGIN AGENT {} {}'.format(b, str(agent.name), b))
             logger.debug('AGENT: {}'.format(agent.name))
-            logger.debug('STARTING LOCATION: {}'.format(agent.start.strip()))
-            logger.debug('MEEETING LOCATION: {}'.format(agent.end.strip()))
+            logger.debug('STARTING LOCATION (GEO): {}'.format(agent.start_geo.strip()))
+            logger.debug('MEEETING LOCATION (GEO): {}'.format(agent.end_geo.strip()))
+            logger.debug('STARTING ADDRESS: {}'.format(agent.start_address[0].strip()))
+            logger.debug('MEEETING ADDRESS: {}'.format(agent.end_address[0].strip()))
             logger.debug('SPEED: {}'.format(agent.speed))
             logger.debug('MODE: {}'.format(agent.mode))
             logger.debug('DEPARTURE TIME: {}'.format(agent.leave))
@@ -122,8 +126,10 @@ def log_results(agents, logger):
         # Log stuff to a file
         logger.info('{} BEGIN AGENT {} {}'.format(b, str(agent.name), b))
         logger.info('AGENT: {:>}'.format(agent.name))
-        logger.info('STARTING LOCATION: {:>}'.format(agent.start.strip()))
-        logger.info('MEEETING LOCATION: {}'.format(agent.end.strip()))
+        logger.info('STARTING LOCATION: {:>}'.format(agent.start_geo.strip()))
+        logger.info('MEEETING LOCATION: {}'.format(agent.end_geo.strip()))
+        logger.info('STARTING ADDRESS: {}'.format(agent.start_address[0].strip()))
+        logger.info('MEEETING ADDRESS: {}'.format(agent.end_address[0].strip()))
         logger.info('SPEED: {}'.format(agent.speed))
         logger.info('MODE: {}'.format(agent.mode))
         logger.info('DURATION: {}'.format(agent.delta))
@@ -174,8 +180,8 @@ def generate_agents(n, dest):
 
     while n:                            # Add agents to the list
         a = agent.agent(next(names))    # Generate an agent with a name
-        a.start = random_location()     # Give agent a starting location
-        a.end = dest                    # Set the meeting point
+        a.start_geo = random_location() # Give agent a starting location
+        a.end_geo = dest                # Set the meeting point
         a.speed = random.randint(2, 80) # Random speed
         agents.append(a)                # Add to list of agents
         mode_of_transit(a)              # Set transport mode
