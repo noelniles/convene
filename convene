@@ -6,7 +6,7 @@ destination to convene.
 """
 import argparse, cProfile, os, logging, time, random
 from datetime import datetime, timedelta
-import agent
+import agent, config
 
 
 # This program depends on googlemaps python bindings. I use the following
@@ -29,10 +29,10 @@ def namer():
 
 def key():
     """Get the google maps api key from the text file."""
-    if not os.path.exists('mapkey.txt'):
+    if not os.path.exists(config.MAPKEY):
         print("You need to get a google maps API key and save it in a file called 'mapkey.txt")
         sys.exit(-1)
-    with open('mapkey.txt') as f:
+    with open(config.MAPKEY) as f:
         line = f.readline()
     return line
 
@@ -78,7 +78,7 @@ def last_line(afile):
 
 def random_location():
     """Generate a random location to be used by the agents.  """
-    return random_line('addr.txt')
+    return random_line(config.ADDRS)
 
 def plan(agents, dest, meeting_time, debug=False):
     """For each agent in the set of agents, calculate the optimal departure time
@@ -136,7 +136,7 @@ def log_setup(fn=None):
     logger.setLevel(logging.INFO)
 
     if fn: logfile = fn
-    else: logfile = 'convene.log'
+    else: logfile = config.LOG 
 
     # Handle for the log file
     logfile_handle = logging.FileHandler(logfile)
@@ -201,7 +201,7 @@ def start_logging(logfile, logger, dest, meeting_time):
 
 def main():
     """Main entry point all wrapped up to allow easy profiling."""
-    if not args.l: args.l = 'convene.log'
+    if not args.l: args.l = config.LOG
     logfile, logger = log_setup(args.l) # Set up the logs.
 
     dest = random_location()            # Generate a random place to convene.
@@ -217,8 +217,8 @@ if __name__ == '__main__':
     validate_args(args)                 # Check for mandatory arguments.
     if args.p:
         import pstats
-        cProfile.run('main()', 'convene_stats.log')     # Profile...
-        p = pstats.Stats('convene_stats.log')
+        cProfile.run('main()', config.STATS)     # Profile...
+        p = pstats.Stats(config.STATS)
         p.strip_dirs().sort_stats('time').print_stats(10)
     else: main()                        # Or just run.
 
