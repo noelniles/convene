@@ -7,6 +7,9 @@
 # Shhh... Google maps API key
 mapkey.txt
 
+# OpenStreetMaps files
+*.pbf
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

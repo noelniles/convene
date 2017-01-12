@@ -6,7 +6,7 @@ destination to convene.
 """
 import argparse, cProfile, os, logging, time, random
 from datetime import datetime, timedelta
-import agent, config
+import agent, config, mapview
 
 
 # This program depends on googlemaps python bindings. I use the following
@@ -93,11 +93,16 @@ def plan(agents, dest, meeting_time, debug=False):
     print('planning...')
     k = key().strip()
     gmaps = googlemaps.Client(k)
+    mv = mapview.MapView()
     print('meeting time: ', meeting_time)
     for a in agents:
+        latlong = str(a.start_geo)
         dist = gmaps.distance_matrix(a.start_geo, dest, mode=a.mode)
         a.start_address = dist['origin_addresses']
         a.end_address = dist['destination_addresses']
+        print('latlong: ', latlong)
+        kv = {a.start_address[0]:(latlong)}
+        mv.add(kv)
         if debug:
             print(dist)
         try:
@@ -107,7 +112,7 @@ def plan(agents, dest, meeting_time, debug=False):
         delta = timedelta(seconds=seconds_away)
         a.delta = delta
         a.leave = meeting_time - delta
-
+    print(mv.getkml())
 def log_results(agents, logger):
     for agent in agents:                # Log the results for each agent.
         b = '-'*20                      # A delimeter between records
@@ -215,7 +220,9 @@ def main():
 
     start_logging(logfile, logger, dest, meeting_time)
     agents = generate_agents(args.n, dest)
-    plan(agents, dest, meeting_time, debug=args.d)  # Calculate departure time.
+    
+    # Send the request to google maps and set the fields in all the agents.
+    plan(agents, dest, meeting_time, debug=args.d)
     log_results(agents, logger)
 
 if __name__ == '__main__':
